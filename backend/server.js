@@ -36,19 +36,21 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/lostfound';
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server chal raha hai: http://localhost:${PORT} (http://127.0.0.1:${PORT})`);
-});
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server chal raha hai: http://localhost:${PORT} (http://127.0.0.1:${PORT})`);
+  });
 
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`\n⚠️ Port ${PORT} pehle se use mein hai (EADDRINUSE).`);
-    console.error(`Port ko free karein ya process restart karein.\n`);
-    process.exit(1);
-  } else {
-    console.error('Server error:', err);
-  }
-});
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n⚠️ Port ${PORT} pehle se use mein hai (EADDRINUSE).`);
+      console.error(`Port ko free karein ya process restart karein.\n`);
+      process.exit(1);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+}
 
 mongoose
   .connect(MONGO_URI)
@@ -58,4 +60,6 @@ mongoose
   .catch((err) => {
     console.error('MongoDB connect nahi hua:', err.message);
   });
+
+module.exports = app;
 
